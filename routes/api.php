@@ -31,3 +31,6 @@ Route::group([
     Route::post('register', 'AuthController@register');
     Route::post('currentUser', 'AuthController@currentUser');
 });
+
+Route::apiResource('product', 'ProductController');
+Route::apiResource('admin/product', 'Admin\ProductController')->middleware('auth.admin');
