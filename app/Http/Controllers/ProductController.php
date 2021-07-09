@@ -4,11 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\ProductRequest;
+use Illuminate\Database\Eloquent\Collection;
 
 class ProductController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth.admin', ['except' => ['index', 'show']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -31,19 +38,24 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  ProductRequest $request
+     * @return Response
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
-        //
+        $inputs = $request->validated();
+        $inputs += [
+            'created_by' => Auth::id(),
+        ];
+
+        return Product::create($inputs);
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show($id)
     {
@@ -53,23 +65,42 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param \Illuminate\Http\ProductRequest $request
+     * @param int $id
+     *
+     * * @throws \Throwable
+     *
+     * @return Collection|\Illuminate\Database\Eloquent\Model
      */
-    public function update(Request $request, $id)
+    public function update(ProductRequest $request, $id)
     {
-        //
+        $inputs = $request->validated();
+        $product = Product::query()->findOrFail($id);
+
+        foreach ($inputs as $key => $value) {
+            $product->$key = $value;
+        }
+
+        $product->saveOrFail();
+
+        return $product;
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     *
+     * @throws \Exception
+     *
+     * @return string
      */
     public function destroy($id)
     {
-        //
+        $product = Product::query()->findOrFail($id);
+
+        $product->delete();
+
+        return __('messages.product_id_deleted', ['title' => $product->title]);
     }
 }

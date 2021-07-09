@@ -33,4 +33,3 @@ Route::group([
 });
 
 Route::apiResource('product', 'ProductController');
-Route::apiResource('admin/product', 'Admin\ProductController')->middleware('auth.admin');
