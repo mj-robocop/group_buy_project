@@ -33,3 +33,4 @@ Route::group([
 });
 
 Route::apiResource('product', 'ProductController');
+Route::apiResource('groupBuyProduct', 'GroupBuyProductController');
