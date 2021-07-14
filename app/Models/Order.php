@@ -15,4 +15,9 @@ class Order extends Model
      * @var array
      */
     protected $guarded = [];
+
+    public function userRelation()
+    {
+        return $this->hasOne(User::class);
+    }
 }

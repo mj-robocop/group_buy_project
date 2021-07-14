@@ -15,4 +15,9 @@ class OrderItem extends Model
      * @var array
      */
     protected $guarded = [];
+
+    public function invoiceRelation()
+    {
+        return $this->belongsTo(Order::class);
+    }
 }

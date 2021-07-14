@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Infrastructure\Enumerations\OrderStatusEnums;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
@@ -61,5 +63,36 @@ class User extends Authenticatable implements JWTSubject
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'user_roles');
+    }
+
+    public function ordersRelation()
+    {
+        return $this->hasMany(Order::class, 'user_id');
+    }
+
+    public function ordersPaidRelation()
+    {
+        return $this->ordersRelation()->where(
+            'status',
+            OrderStatusEnums::PAID
+        );
+    }
+
+    public function orderBasketRelation()
+    {
+        return $this->ordersRelation()->where(
+            'status',
+            OrderStatusEnums::BASKET
+        );
+    }
+
+    public function orderItemsRelation()
+    {
+        return $this->hasMany(OrderItem::class, 'userId')
+            ->join('orders', function (JoinClause $clause) {
+                $clause->on('order_items.order_id', 'orders.id');
+                $clause->whereNull('orders.deleted_at');
+                $clause->whereNull('order_items.deleted_at');
+            });
     }
 }
