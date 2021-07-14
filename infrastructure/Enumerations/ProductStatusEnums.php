@@ -9,8 +9,10 @@ namespace Infrastructure\Enumerations;
  */
 final class ProductStatusEnums
 {
-    const AVAILABLE = 2001;
-    const COMING_SOON = 2002;
-    const NOT_PUBLISHED = 2003;
-    const STOP_PRODUCTION = 2004;
+    const PARENT_ID = 1281;
+
+    const AVAILABLE = 1282;
+    const COMING_SOON = 1283;
+    const NOT_PUBLISHED = 1284;
+    const STOP_PRODUCTION = 1285;
 }
