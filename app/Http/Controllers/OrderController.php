@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,7 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        return Auth::user();
+        return Auth::user()->ordersRelation()->paginate();
     }
 
     /**
@@ -28,7 +29,7 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        return Auth::user();
+        return Order::query()->find($id);
     }
 
     /**
@@ -42,15 +43,18 @@ class OrderController extends Controller
      */
     public function destroy($id)
     {
+        $order = Order::query()->findOrFail($id);
+
         return Auth::user();
     }
 
     /**
+     * @param Request $request
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function getBasket()
+    public function getBasket(Request $request)
     {
-        return Auth::user();
+        return Auth::user()->orderBasketRelation()->first();
     }
 
     /**
@@ -59,6 +63,8 @@ class OrderController extends Controller
      */
     public function addToBasket(Request $request)
     {
+        dd(4456);
+
         return Auth::user();
     }
 
@@ -68,6 +74,8 @@ class OrderController extends Controller
      */
     public function editAddress(Request $request)
     {
+        dd(5147685);
+
         return Auth::user();
     }
 }

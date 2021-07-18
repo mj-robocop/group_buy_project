@@ -20,4 +20,9 @@ class Order extends Model
     {
         return $this->hasOne(User::class);
     }
+
+    public function orderItemsRelation()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }

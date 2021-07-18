@@ -16,7 +16,7 @@ class OrderItem extends Model
      */
     protected $guarded = [];
 
-    public function invoiceRelation()
+    public function orderRelation()
     {
         return $this->belongsTo(Order::class);
     }

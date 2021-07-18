@@ -29,12 +29,12 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
 Route::apiResource('product', 'ProductController');
 Route::apiResource('groupBuyProduct', 'GroupBuyProductController');
 
-Route::group(['middleware' => 'auth', 'prefix' => 'order'], function ($router) {
-    Route::get('/', 'OrderController@index');
+Route::group(['middleware' => 'auth'], function ($router) {
+    Route::get('order', 'OrderController@index');
     Route::get('order/{id}', 'OrderController@show');
     Route::delete('order/{id}', 'OrderController@destroy');
 
-    Route::get('getBasket', 'OrderController@getBasket');
-    Route::post('addToBasket', 'OrderController@addToBasket');
-    Route::post('editAddress', 'OrderController@editAddress');
+    Route::get('basket', 'OrderController@getBasket');
+    Route::post('basket/addToBasket', 'OrderController@addToBasket');
+    Route::post('basket/editAddress', 'OrderController@editAddress');
 });
