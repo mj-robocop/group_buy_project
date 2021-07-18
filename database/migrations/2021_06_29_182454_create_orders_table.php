@@ -21,7 +21,7 @@ class CreateOrdersTable extends Migration
             $table->integer('province');
             $table->integer('city');
             $table->string('address', 1024);
-            $table->integer('postal_code');
+            $table->string('postal_code', 20)->nullable();
             $table->string('receiver_name', 64);
             $table->string('receiver_mobile', 20);
             $table->timestamp('paid_at')->nullable();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -69,13 +70,44 @@ class OrderController extends Controller
     }
 
     /**
-     * @param  Request  $request
-     * @return Collection
+     * @param Request $request
+     * @return Order
+     * @throws \Throwable
      */
     public function editAddress(Request $request)
     {
-        dd(5147685);
+        $validatedData = $request->validate([
+            'address' => 'required|string|min:10|max:255',
+            'receiver_name' => 'required|string|min:2|max:50',
+            'receiver_mobile' => 'required|string|min:7|max:20',
+            'postal_code' => 'nullable|int|digits:10',
+            'province' => [
+                'required',
+                Rule::exists('enumerations', 'id')->where(function ($query) {
+                    $query->where('parent_id', 2);
+                })
+            ],
+            'city' => [
+                'required',
+                Rule::exists('enumerations', 'id')->where(function ($query) use ($request) {
+                    $query->where('parent_id', $request->input('province'));
+                })
+            ]
+        ]);
 
-        return Auth::user();
+        /** @var Order $basket */
+        $basket = Auth::user()->orderBasketRelation()->first();
+
+        if ($basket == null) {
+            abort(422, __('messages.no_basket_found'));
+        }
+
+        foreach ($validatedData as $key => $value) {
+            $basket->$key = $value;
+        }
+
+        $basket->saveOrFail();
+
+        return $basket;
     }
 }
