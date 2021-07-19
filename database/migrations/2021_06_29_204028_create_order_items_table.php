@@ -18,11 +18,11 @@ class CreateOrderItemsTable extends Migration
             $table->integer('order_id');
             $table->integer('product_id');
             $table->integer('user_id');
-            $table->integer('status');
+            $table->integer('status')->nullable();
             $table->integer('amount');
             $table->integer('quantity');
             $table->integer('weight');
-            $table->integer('delivery_cost');
+            $table->integer('delivery_cost')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();

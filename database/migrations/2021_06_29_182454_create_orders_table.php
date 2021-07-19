@@ -18,12 +18,12 @@ class CreateOrdersTable extends Migration
             $table->integer('user_id');
             $table->integer('status');
             $table->integer('amount');
-            $table->integer('province');
-            $table->integer('city');
-            $table->string('address', 1024);
+            $table->integer('province')->nullable();
+            $table->integer('city')->nullable();
+            $table->string('address', 1024)->nullable();
             $table->string('postal_code', 20)->nullable();
-            $table->string('receiver_name', 64);
-            $table->string('receiver_mobile', 20);
+            $table->string('receiver_name', 64)->nullable();
+            $table->string('receiver_mobile', 20)->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
