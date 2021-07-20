@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Collection;
+use Infrastructure\Enumerations\OrderStatusEnums;
 
 class OrderController extends Controller
 {
@@ -19,18 +20,28 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        return Auth::user()->ordersRelation()->paginate();
+        $validatedData = $request->validate([
+            'limit' => 'nullable|int|max:50',
+            'offset' => 'nullable|int',
+        ]);
+
+        return Auth::user()->ordersRelation()
+            ->with('orderItemsRelation')
+            ->where('orders.status', '!=', OrderStatusEnums::BASKET)
+            ->limit($validatedData['limit'] ?? 10)
+            ->offset($validatedData['offset'] ?? 0)
+            ->get();
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return Response
+     * @return Order
      */
     public function show($id)
     {
-        return Order::query()->find($id);
+        return Order::query()->with('orderItemsRelation')->find($id);
     }
 
     /**
@@ -55,7 +66,9 @@ class OrderController extends Controller
      */
     public function getBasket(Request $request)
     {
-        return Auth::user()->orderBasketRelation()->first();
+        return Auth::user()->orderBasketRelation()
+            ->with('orderItemsRelation')
+            ->first();
     }
 
     /**
