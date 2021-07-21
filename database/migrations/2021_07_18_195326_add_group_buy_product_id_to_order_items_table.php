@@ -14,7 +14,7 @@ class AddGroupBuyProductIdToOrderItemsTable extends Migration
     public function up()
     {
         Schema::table('order_items', function (Blueprint $table) {
-            $table->integer('group_buy_product_id');
+            $table->integer('group_buy_product_id')->nullable();
         });
     }
 
