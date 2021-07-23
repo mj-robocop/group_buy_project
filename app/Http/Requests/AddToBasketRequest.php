@@ -12,7 +12,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Infrastructure\Enumerations\ProductStatusEnums;
 use Infrastructure\Enumerations\GroupBuyProductStatusEnums;
 
-class AddToCartRequest extends FormRequest
+class AddToBasketRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

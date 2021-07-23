@@ -9,7 +9,7 @@ use Illuminate\Http\Response;
 use App\Models\GroupBuyProduct;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\AddToCartRequest;
+use App\Http\Requests\AddToBasketRequest;
 use Infrastructure\Enumerations\OrderStatusEnums;
 
 class OrderController extends Controller
@@ -87,21 +87,10 @@ class OrderController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function getBasket(Request $request)
-    {
-        return Auth::user()->orderBasketRelation()
-            ->with('orderItemsRelation')
-            ->first();
-    }
-
-    /**
-     * @param AddToCartRequest $request
+     * @param AddToBasketRequest $request
      * @return array
      */
-    public function addToBasket(AddToCartRequest $request)
+    public function addToBasket(AddToBasketRequest $request)
     {
         $validatedData = $request->validated();
 
