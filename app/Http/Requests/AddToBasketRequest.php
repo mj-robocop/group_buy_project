@@ -40,12 +40,13 @@ class AddToBasketRequest extends FormRequest
                 })
             ],
             'group_buy_product_id' => [
-                'required',
+                'nullable',
                 Rule::exists('group_buy_products', 'id')->where(function ($query) {
                     $query->where('end_time', '>', Carbon::now())
                         ->where('start_time', '<=', Carbon::now())
                         ->where('product_id', $this->input('product_id'))
-                        ->where('status', GroupBuyProductStatusEnums::ACTIVE);
+                        ->where('status', GroupBuyProductStatusEnums::ACTIVE)
+                        ->whereNotNull('deleted_at');
                 })
             ],
             'quantity' => [
