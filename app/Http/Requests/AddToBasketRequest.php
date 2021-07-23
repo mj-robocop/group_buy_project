@@ -36,7 +36,8 @@ class AddToBasketRequest extends FormRequest
                 'required',
                 Rule::exists('products', 'id')->where(function ($query) {
                     $query->where('status', ProductStatusEnums::AVAILABLE)
-                        ->where('inventory', '>=', $this->input('quantity'));
+                        ->where('inventory', '>=', $this->input('quantity'))
+                        ->whereNotNull('deleted_at');
                 })
             ],
             'group_buy_product_id' => [
