@@ -98,7 +98,7 @@ class OrderController extends Controller
         $product = Product::query()->findOrFail($validatedData['product_id']);
         $groupBuyProduct = null;
 
-        if ($validatedData['group_buy_product_id'] != null) {
+        if (array_key_exists('group_buy_product_id', $validatedData)) {
             $groupBuyProduct = GroupBuyProduct::query()->findOrFail($validatedData['group_buy_product_id']);
         }
 
@@ -160,36 +160,31 @@ class OrderController extends Controller
             ->where('product_id', $product->id)
             ->first();
 
-        $groupBuyProductId = null;
-        $amount = $product->price * $quantity;
-        $weight = $product->packaged_weight + ($product->net_weight * $quantity - 1);
-
-        if ($groupBuyProduct != null) {
-            $groupBuyProductId = $groupBuyProduct->id;
-            $amount = $groupBuyProduct->price * $quantity;
-        }
-
         if ($basketItem) {
             $quantity = $basketItem->quantity + $quantity;
 
             if ($quantity < 1) {
                 $basketItem->delete();
             } else {
-                $basketItem->amount = $amount;
-                $basketItem->weight = $weight;
-                $basketItem->quantity = $quantity;
-                $basketItem->group_buy_product_id = $groupBuyProductId;
+                $data = $this->getAddToBasketData($product, $quantity, $groupBuyProduct);
+
+                $basketItem->amount = $data['amount'];
+                $basketItem->weight = $data['weight'];
+                $basketItem->quantity = $data['quantity'];
+                $basketItem->group_buy_product_id = $data['groupBuyProductId'];
 
                 $basketItem->saveOrFail();
             }
         } elseif ($quantity > 0) {
+            $data = $this->getAddToBasketData($product, $quantity, $groupBuyProduct);
+
             $basket->orderItemsRelation()->create([
-                'amount' => $amount,
-                'weight' => $weight,
+                'amount' => $data['amount'],
+                'weight' => $data['weight'],
                 'user_id' => Auth::id(),
-                'quantity' => $quantity,
+                'quantity' => $data['quantity'],
                 'product_id' => $product->id,
-                'group_buy_product_id' => $groupBuyProductId,
+                'group_buy_product_id' => $data['groupBuyProductId'],
             ]);
         }
     }
@@ -205,5 +200,24 @@ class OrderController extends Controller
         $order->amount = $amount;
 
         $order->saveOrFail();
+    }
+
+    private function getAddToBasketData($product, $quantity, $groupBuyProduct)
+    {
+        $groupBuyProductId = null;
+        $amount = $product->price * $quantity;
+        $weight = $product->packaged_weight + ($product->net_weight * ($quantity - 1));
+
+        if ($groupBuyProduct != null) {
+            $groupBuyProductId = $groupBuyProduct->id;
+            $amount = $groupBuyProduct->price * $quantity;
+        }
+
+        return [
+            'amount' => $amount,
+            'weight' => $weight,
+            'quantity' => $quantity,
+            'groupBuyProductId' => $groupBuyProductId
+        ];
     }
 }
