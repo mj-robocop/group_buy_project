@@ -96,7 +96,11 @@ class OrderController extends Controller
 
         $quantity = $validatedData['quantity'];
         $product = Product::query()->findOrFail($validatedData['product_id']);
-        $groupBuyProduct = GroupBuyProduct::query()->findOrFail($validatedData['group_buy_product_id']);
+        $groupBuyProduct = null;
+
+        if ($validatedData['group_buy_product_id'] != null) {
+            $groupBuyProduct = GroupBuyProduct::query()->findOrFail($validatedData['group_buy_product_id']);
+        }
 
         $basket = Order::getBasket(Auth::id());
         $this->updateOrCreateOrderItem($product, $basket, $quantity, $groupBuyProduct);
