@@ -194,7 +194,7 @@ class OrderController extends Controller
         $amount = 0;
 
         foreach ($order->orderItemsRelation() as $item) {
-            $amount += $item->amount;
+            $amount += $item->amount * $item->quantity;
         }
 
         $order->amount = $amount;
@@ -205,12 +205,12 @@ class OrderController extends Controller
     private function getAddToBasketData($product, $quantity, $groupBuyProduct)
     {
         $groupBuyProductId = null;
-        $amount = $product->price * $quantity;
+        $amount = $product->price;
         $weight = $product->packaged_weight + ($product->net_weight * ($quantity - 1));
 
         if ($groupBuyProduct != null) {
+            $amount = $groupBuyProduct->price;
             $groupBuyProductId = $groupBuyProduct->id;
-            $amount = $groupBuyProduct->price * $quantity;
         }
 
         return [

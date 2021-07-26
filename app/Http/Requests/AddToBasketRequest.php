@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Carbon\Carbon;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Validation\Rule;
