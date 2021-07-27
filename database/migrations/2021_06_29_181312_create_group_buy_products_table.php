@@ -18,7 +18,7 @@ class CreateGroupBuyProductsTable extends Migration
             $table->string('title', 100);
             $table->integer('product_id');
             $table->integer('price');
-            $table->integer('quantity');
+            $table->integer('inventory');
             $table->integer('status');
             $table->string('description', 1024);
             $table->integer('user_quantity_limit')->nullable();

@@ -88,20 +88,20 @@ class AddToBasketRequest extends FormRequest
                     } elseif (
                         $groupBuyProduct != null
                         && (
-                            $groupBuyProduct->quantity < $value
+                            $groupBuyProduct->inventory < $value
                             || (
                                 $groupBuyProduct->user_quantity_limit != null
                                 && $groupBuyProduct->user_quantity_limit < $value
                             )
                         )
                     ) {
-                        if ($groupBuyProduct->quantity == 0) {
+                        if ($groupBuyProduct->inventory == 0) {
                             return $fail(__('messages.unavailable_group_buy_product', [
                                 'title' => $groupBuyProduct->title
                             ]));
                         }
 
-                        $maxQuantity = $groupBuyProduct->quantity;
+                        $maxQuantity = $groupBuyProduct->inventory;
 
                         if (
                             $groupBuyProduct->user_quantity_limit != null

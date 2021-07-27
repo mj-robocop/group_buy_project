@@ -38,3 +38,11 @@ Route::group(['middleware' => 'auth'], function ($router) {
     Route::post('basket/addToBasket', 'OrderController@addToBasket');
     Route::post('basket/editAddress', 'OrderController@editAddress');
 });
+
+Route::group(['middleware' => 'auth', 'prefix' => 'payment'], function ($router) {
+    Route::get('do/{orderId}', 'PaymentController@doPayment');
+    Route::any('done/{orderId}', 'PaymentController@donePayment')->name('donePayment');
+
+    Route::post('setPayBack', 'PaymentController@setPayBack');
+    Route::get('admin/getPayments', 'PaymentController@getPayments')->middleware('auth.admin');
+});

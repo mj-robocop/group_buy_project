@@ -29,7 +29,7 @@ class GroupBuyProductRequest extends FormRequest
             'title' => 'required|string|min:3|max:100',
             'product_id' => 'required|exists:products,id',
             'price' => 'required|int|digits_between:5,10',
-            'quantity' => 'required|int|min:1|max:10000',
+            'inventory' => 'required|int|min:1|max:10000',
             'description' => 'required|string|max:1000',
             'user_quantity_limit' => 'nullable|int|min:1',
             'is_special' => 'nullable|boolean',
