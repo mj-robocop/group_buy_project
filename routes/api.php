@@ -41,7 +41,7 @@ Route::group(['middleware' => 'auth'], function ($router) {
 
 Route::group(['middleware' => 'auth', 'prefix' => 'payment'], function ($router) {
     Route::get('do/{orderId}', 'PaymentController@doPayment');
-    Route::any('done/{orderId}', 'PaymentController@donePayment')->name('donePayment');
+    Route::any('done/{orderId}/{payId}', 'PaymentController@donePayment')->name('donePayment');
 
     Route::post('setPayBack', 'PaymentController@setPayBack');
     Route::get('admin/getPayments', 'PaymentController@getPayments')->middleware('auth.admin');

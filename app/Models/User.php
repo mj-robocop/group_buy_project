@@ -95,4 +95,9 @@ class User extends Authenticatable implements JWTSubject
                 $clause->whereNull('order_items.deleted_at');
             });
     }
+
+    public function orderPaysRelation()
+    {
+        return $this->hasMany(OrderPay::class, 'user_id');
+    }
 }

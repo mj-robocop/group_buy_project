@@ -75,4 +75,9 @@ class Order extends Model
 
         return self::getBasket($userId, false);
     }
+
+    public function orderPaysRelation()
+    {
+        return $this->hasMany(OrderPay::class, 'order_id');
+    }
 }

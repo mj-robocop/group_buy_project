@@ -7,12 +7,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderPay extends Model
 {
-    use SoftDeletes;
-
     /**
      * The attributes that aren't mass assignable.
      *
      * @var array
      */
     protected $guarded = [];
+
+    public function orderRelation()
+    {
+        return $this->hasOne(Order::class);
+    }
 }

@@ -19,7 +19,7 @@ class CreateOrderPaysTable extends Migration
             $table->integer('order_id');
             $table->integer('amount');
             $table->integer('status');
-            $table->jsonb('metadata');
+            $table->jsonb('metadata')->nullable();
             $table->timestamps();
         });
     }

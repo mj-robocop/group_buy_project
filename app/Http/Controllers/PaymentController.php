@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\OrderItem;
+use App\Models\OrderPay;
 use Infrastructure\Enumerations\GroupBuyProductStatusEnums;
 use RuntimeException;
 use App\Models\Order;
@@ -29,20 +30,31 @@ class PaymentController extends Controller
         $orderItems = $order->orderItemsRelation()->get();
 
         $this->checkOrderItems($orderItems);
-        $this->checkOrderAmount($orderItems, true);
+        $this->checkOrderItemsAmount($order, $orderItems, true);
+        $this->checkOrderAmount($order, $orderItems, true);
 
         $order->status = OrderStatusEnums::UNPAID;
 
         $order->saveOrFail();
 
-        return redirect(route('donePayment', ['orderId' => $order->id]));
+        $pay = $order->orderPaysRelation()->create([
+            'amount' => $order->amount,
+            'status' => $order->status,
+            'user_id' => $order->user_id,
+        ]);
+
+        return redirect(route('donePayment', [
+            'payId' => $pay->id,
+            'orderId' => $order->id
+        ]));
     }
 
     /**
      * @param int $orderId
+     * @param int $payId
      * @return array
      */
-    public function donePayment($orderId)
+    public function donePayment($orderId, $payId)
     {
         $order = Order::query()->find($orderId);
         $orderItems = [];
@@ -51,7 +63,10 @@ class PaymentController extends Controller
             $orderItems = $order->orderItemsRelation()->get();
         }
 
+        $pay = OrderPay::query()->findOrFail($payId);
+
         return [
+            'pay' => $pay,
             'order' => $order,
             'items' => $orderItems
         ];
@@ -129,7 +144,7 @@ class PaymentController extends Controller
         }
     }
 
-    private function checkOrderAmount($orderItems, $reCalculate = false)
+    private function checkOrderItemsAmount($order, $orderItems, $reCalculate = false)
     {
         $orderItemIds = $orderItems->pluck('id');
 
@@ -196,6 +211,31 @@ class PaymentController extends Controller
                 $orderItem->saveOrFail();
             }
         }
+
+        $orderController = new OrderController();
+        $orderController->calculateOrderAmount($order);
+
+        throw new RuntimeException(__('messages.price_is_changed'));
+    }
+
+    private function checkOrderAmount($order, $orderItems, $reCalculate = false)
+    {
+        $amount = 0;
+
+        foreach ($orderItems as $item) {
+            $amount += $item->amount * $item->quantity;
+        }
+
+        if ($order->amount == $amount) {
+            return true;
+        }
+
+        if (!$reCalculate) {
+            throw new RuntimeException(__('messages.order_amount_is_wrong'));
+        }
+
+        $orderController = new OrderController();
+        $orderController->calculateOrderAmount($order);
 
         throw new RuntimeException(__('messages.price_is_changed'));
     }
