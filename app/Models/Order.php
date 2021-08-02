@@ -69,7 +69,7 @@ class Order extends Model
             );
 
             DB::commit();
-        } catch (Throwable $throwable) {
+        } catch (\Throwable $throwable) {
             DB::rollback();
         }
 

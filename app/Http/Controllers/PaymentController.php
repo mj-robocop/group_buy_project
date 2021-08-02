@@ -2,20 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OrderItem;
-use App\Models\OrderPay;
-use Infrastructure\Enumerations\GroupBuyProductStatusEnums;
 use RuntimeException;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\OrderPay;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use App\Models\GroupBuyProduct;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\AddToBasketRequest;
+use Illuminate\Support\Facades\DB;
 use Infrastructure\Enumerations\OrderStatusEnums;
 use Infrastructure\Enumerations\ProductStatusEnums;
+use Infrastructure\Enumerations\OrderItemStatusEnums;
+use Infrastructure\Enumerations\GroupBuyProductStatusEnums;
 
 class PaymentController extends Controller
 {
@@ -53,20 +51,49 @@ class PaymentController extends Controller
      * @param int $orderId
      * @param int $payId
      * @return array
+     * @throws \Throwable
      */
     public function donePayment($orderId, $payId)
     {
+        $pay = OrderPay::query()->find($payId);
         $order = Order::query()->find($orderId);
-        $orderItems = [];
 
-        if ($order != null) {
-            $orderItems = $order->orderItemsRelation()->get();
+        if (
+            $pay == null
+            || $order == null
+            || $pay->status != OrderStatusEnums::UNPAID
+            || $order->status != OrderStatusEnums::UNPAID
+        ) {
+            throw new RuntimeException(__('messages.order_is_invalid'));
         }
 
-        $pay = OrderPay::query()->findOrFail($payId);
+        $orderItems = $order->orderItemsRelation()->get();
+
+        DB::beginTransaction();
+        try {
+            $pay->status = OrderStatusEnums::PAID;
+            $order->status = OrderStatusEnums::PAID;
+
+            $pay->saveOrFail();
+            $order->saveOrFail();
+
+            foreach ($orderItems as $item) {
+                if ($item->group_buy_product_id != null) {
+                    $item->status = OrderItemStatusEnums::WAITING_FOR_GROUP_BUY;
+                } else {
+                    $item->status = OrderItemStatusEnums::VERIFIED;
+                }
+
+                $item->saveOrFail();
+            }
+            DB::commit();
+        } catch (\Throwable $throwable) {
+            DB::rollBack();
+
+            throw new RuntimeException(__('messages.order_is_invalid') . $throwable->getMessage());
+        }
 
         return [
-            'pay' => $pay,
             'order' => $order,
             'items' => $orderItems
         ];
