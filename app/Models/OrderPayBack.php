@@ -15,4 +15,9 @@ class OrderPayBack extends Model
      * @var array
      */
     protected $guarded = [];
+
+    public function orderPaysRelation()
+    {
+        return $this->belongsTo(OrderPay::class, 'pay_id');
+    }
 }

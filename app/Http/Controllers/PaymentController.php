@@ -104,22 +104,30 @@ class PaymentController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param int $orderItemId
      * @return array
      */
-    public function setPayBack(Request $request)
+    public function setPayBack($orderItemId)
     {
-        $order = Order::query()->find($id);
-        $orderItems = [];
+        $orderItem = OrderItem::query()->findOrFail($orderItemId);
 
-        if ($order != null) {
-            $orderItems = $order->orderItemsRelation()->get();
+        if ($orderItem->status == null) {
+            throw new RuntimeException(__('messages.can_not_set_pay_back'));
         }
 
-        return [
-            'order' => $order,
-            'items' => $orderItems
-        ];
+        $pay = OrderPay::query()
+            ->where('order_id', $orderItem->order_id)
+            ->where('status', OrderStatusEnums::PAID)
+            ->first();
+
+        $pay->payBackRelation()->firstOrCreate([
+            'user_id' => $orderItem->user_id,
+            'order_id' => $orderItem->order_id
+            ],
+            [
+            'status' => OrderStatusEnums::UNPAID,
+            'amount' => $orderItem->amount * $orderItem->quantity,
+        ]);
     }
 
     /**

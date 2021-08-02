@@ -18,4 +18,9 @@ class OrderPay extends Model
     {
         return $this->hasOne(Order::class);
     }
+
+    public function payBackRelation()
+    {
+        return $this->hasMany(OrderPayBack::class, 'pay_id');
+    }
 }

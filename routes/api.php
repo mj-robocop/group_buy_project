@@ -32,7 +32,7 @@ Route::apiResource('groupBuyProduct', 'GroupBuyProductController');
 Route::group(['middleware' => 'auth'], function ($router) {
     Route::get('order', 'OrderController@index');
     Route::get('order/{id}', 'OrderController@show');
-    Route::delete('order/{id}', 'OrderController@destroy');
+    Route::delete('order/item/{id}', 'OrderController@cancelOrderItem');
 
     Route::get('basket', 'OrderController@getBasket');
     Route::post('basket/addToBasket', 'OrderController@addToBasket');
@@ -43,6 +43,6 @@ Route::group(['middleware' => 'auth', 'prefix' => 'payment'], function ($router)
     Route::get('do/{orderId}', 'PaymentController@doPayment');
     Route::any('done/{orderId}/{payId}', 'PaymentController@donePayment')->name('donePayment');
 
-    Route::post('setPayBack', 'PaymentController@setPayBack');
+    Route::post('setPayBack/{$orderItemId}', 'PaymentController@setPayBack');
     Route::get('admin/getPayments', 'PaymentController@getPayments')->middleware('auth.admin');
 });

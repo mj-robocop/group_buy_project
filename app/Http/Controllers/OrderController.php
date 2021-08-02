@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use RuntimeException;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\GroupBuyProduct;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\AddToBasketRequest;
 use Infrastructure\Enumerations\OrderStatusEnums;
+use Infrastructure\Enumerations\OrderItemStatusEnums;
 
 class OrderController extends Controller
 {
@@ -219,5 +223,39 @@ class OrderController extends Controller
             'quantity' => $quantity,
             'groupBuyProductId' => $groupBuyProductId
         ];
+    }
+
+    public function cancelOrderItem($id)
+    {
+        $orderItem = OrderItem::query()->findOrFail($id);
+
+        if ($orderItem->status == null) {
+            throw new RuntimeException(__('messages.can_not_set_pay_back'));
+        }
+
+        DB::beginTransaction();
+        try {
+            if (in_array($orderItem->status, [
+                OrderItemStatusEnums::VERIFIED,
+                OrderItemStatusEnums::PREPARATION,
+                OrderItemStatusEnums::WAITING_FOR_GROUP_BUY,
+            ])) {
+                $orderItem->status = OrderItemStatusEnums::CANCELED_BEFORE_POSTING;
+                $orderItem->saveOrFail();
+
+                $paymentController = new PaymentController();
+                $paymentController->setPayBack($id);
+            } else {
+                $orderItem->status = OrderItemStatusEnums::RETURN_REQUEST;
+                $orderItem->saveOrFail();
+            }
+            DB::commit();
+        } catch (\Throwable $throwable) {
+            DB::rollBack();
+
+            return ['result' => false];
+        }
+
+        return ['result' => true];
     }
 }
