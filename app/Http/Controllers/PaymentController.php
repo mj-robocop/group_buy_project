@@ -69,6 +69,10 @@ class PaymentController extends Controller
 
         $orderItems = $order->orderItemsRelation()->get();
 
+        $this->checkOrderItems($orderItems);
+        $this->checkOrderItemsAmount($order, $orderItems);
+        $this->checkOrderAmount($order, $orderItems);
+
         DB::beginTransaction();
         try {
             $pay->status = OrderStatusEnums::PAID;
