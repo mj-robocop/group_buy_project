@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OrderPayBack;
 use RuntimeException;
 use App\Models\Order;
 use App\Models\Product;
@@ -149,16 +150,43 @@ class PaymentController extends Controller
      */
     public function getPayments(Request $request)
     {
-        $order = Order::query()->find($id);
-        $orderItems = [];
 
-        if ($order != null) {
-            $orderItems = $order->orderItemsRelation()->get();
-        }
+        $validatedData = $request->validate([
+            'limit' => 'nullable|int|max:50',
+            'offset' => 'nullable|int',
+        ]);
+
+        $pays = OrderPay::query()
+            ->with('orderRelation')
+            ->limit($validatedData['limit'] ?? 10)
+            ->offset($validatedData['offset'] ?? 0)
+            ->get();
 
         return [
-            'order' => $order,
-            'items' => $orderItems
+            'pays' => $pays
+        ];
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function getPaybacks(Request $request)
+    {
+
+        $validatedData = $request->validate([
+            'limit' => 'nullable|int|max:50',
+            'offset' => 'nullable|int',
+        ]);
+
+        $payBacks = OrderPayBack::query()
+            ->with('orderItemsRelation')
+            ->limit($validatedData['limit'] ?? 10)
+            ->offset($validatedData['offset'] ?? 0)
+            ->get();
+
+        return [
+            'payBacks' => $payBacks
         ];
     }
 

@@ -20,4 +20,9 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
+    public function orderPayBacksRelation()
+    {
+        return $this->hasOne(OrderPayBack::class, 'order_item_id');
+    }
 }

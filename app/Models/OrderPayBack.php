@@ -18,4 +18,9 @@ class OrderPayBack extends Model
     {
         return $this->belongsTo(OrderPay::class, 'pay_id');
     }
+
+    public function orderItemsRelation()
+    {
+        return $this->belongsTo(OrderItem::class, 'order_item_id');
+    }
 }

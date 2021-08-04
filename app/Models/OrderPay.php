@@ -16,7 +16,7 @@ class OrderPay extends Model
 
     public function orderRelation()
     {
-        return $this->hasOne(Order::class);
+        return $this->belongsTo(Order::class, 'order_id');
     }
 
     public function payBackRelation()
