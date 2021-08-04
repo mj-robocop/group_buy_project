@@ -28,7 +28,7 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    public static function getBasket($userId, $setBasket = true): self
+    public static function getBasket($userId, $setBasket = true)
     {
         $basket = self::query()
             ->where('user_id', $userId)
@@ -48,15 +48,15 @@ class Order extends Model
         DB::beginTransaction();
 
         try {
-            DB::unprepared('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;');
+            DB::unprepared('SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;');
             DB::insert(
-                'INSERT INTO orders(user_id, amount, status, created_at)'
-                .'SELECT ?, ?, ?, ? WHERE NOT EXISTS('
-                .'SELECT 1 from orders'
-                .'WHERE user_id = ?'
-                .'AND status = ?'
+                'INSERT INTO orders(user_id, amount, status, created_at) '
+                .'SELECT ?, ?, ?, ? WHERE NOT EXISTS( '
+                .'SELECT 1 from orders '
+                .'WHERE user_id = ? '
+                .'AND status = ? '
                 .'AND deleted_at IS NULL '
-                .'LIMIT 1'
+                .'LIMIT 1 '
                 .')',
                 [
                     $userId,
@@ -71,6 +71,8 @@ class Order extends Model
             DB::commit();
         } catch (\Throwable $throwable) {
             DB::rollback();
+
+            throw $throwable;
         }
 
         return self::getBasket($userId, false);

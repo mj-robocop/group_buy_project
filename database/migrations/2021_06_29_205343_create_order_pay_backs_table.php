@@ -17,7 +17,7 @@ class CreateOrderPayBacksTable extends Migration
             $table->id();
             $table->integer('pay_id');
             $table->integer('user_id');
-            $table->integer('order_id');
+            $table->integer('order_item_id');
             $table->integer('amount');
             $table->integer('status');
             $table->timestamps();

@@ -82,13 +82,22 @@ class PaymentController extends Controller
             $order->saveOrFail();
 
             foreach ($orderItems as $item) {
+                $product = Product::query()->findOrFail($item->product_id);
+
                 if ($item->group_buy_product_id != null) {
+                    $groupBuyProduct = GroupBuyProduct::query()->findOrFail($item->group_buy_product_id);
+                    $product->inventory -= $item->quantity;
+                    $groupBuyProduct->inventory -= $item->quantity;
                     $item->status = OrderItemStatusEnums::WAITING_FOR_GROUP_BUY;
+
+                    $groupBuyProduct->saveOrFail();
                 } else {
+                    $product->inventory -= $item->quantity;
                     $item->status = OrderItemStatusEnums::VERIFIED;
                 }
 
                 $item->saveOrFail();
+                $product->saveOrFail();
             }
             DB::commit();
         } catch (\Throwable $throwable) {
@@ -120,9 +129,13 @@ class PaymentController extends Controller
             ->where('status', OrderStatusEnums::PAID)
             ->first();
 
-        $pay->payBackRelation()->firstOrCreate([
+        if ($pay == null) {
+            throw new RuntimeException(__('messages.can_not_set_pay_back'));
+        }
+
+        return $pay->payBackRelation()->firstOrCreate([
             'user_id' => $orderItem->user_id,
-            'order_id' => $orderItem->order_id
+            'order_item_id' => $orderItem->id
             ],
             [
             'status' => OrderStatusEnums::UNPAID,

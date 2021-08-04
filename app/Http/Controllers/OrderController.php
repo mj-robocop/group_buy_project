@@ -91,6 +91,25 @@ class OrderController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @return array
+     */
+    public function getBasket(Request $request)
+    {
+        $basket = Order::getBasket(Auth::id(), false);
+        $items = [];
+
+        if ($basket != null) {
+            $items = $basket->orderItemsRelation()->get();
+        }
+
+        return [
+            'order' => $basket,
+            'items' => $items
+        ];
+    }
+
+    /**
      * @param AddToBasketRequest $request
      * @return array
      */
@@ -112,7 +131,7 @@ class OrderController extends Controller
 
         return [
             'order' => $basket,
-            'orderItems' => $basket->orderItemsRelation()->get()
+            'items' => $basket->orderItemsRelation()->get()
         ];
     }
 
@@ -227,9 +246,13 @@ class OrderController extends Controller
 
     public function cancelOrderItem($id)
     {
-        $orderItem = OrderItem::query()->findOrFail($id);
+        $orderItem = OrderItem::query()->find($id);
 
-        if ($orderItem->status == null) {
+        if (
+            $orderItem == null
+            || $orderItem->status == null
+            || $orderItem->user_id != Auth::id()
+        ) {
             throw new RuntimeException(__('messages.can_not_set_pay_back'));
         }
 
@@ -244,16 +267,18 @@ class OrderController extends Controller
                 $orderItem->saveOrFail();
 
                 $paymentController = new PaymentController();
-                $paymentController->setPayBack($id);
-            } else {
+                $payBack = $paymentController->setPayBack($id);
+            } elseif ($orderItem->status != OrderItemStatusEnums::CANCELED_BEFORE_POSTING) {
                 $orderItem->status = OrderItemStatusEnums::RETURN_REQUEST;
                 $orderItem->saveOrFail();
+            } else {
+                return ['result' => false];
             }
             DB::commit();
         } catch (\Throwable $throwable) {
             DB::rollBack();
 
-            return ['result' => false];
+            return ['result' => false, 'exception' => $throwable];
         }
 
         return ['result' => true];

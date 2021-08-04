@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderPayBack extends Model
 {
-    use SoftDeletes;
-
     /**
      * The attributes that aren't mass assignable.
      *
