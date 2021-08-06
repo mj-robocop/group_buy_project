@@ -217,7 +217,7 @@ class OrderController extends Controller
         $amount = 0;
 
         foreach ($order->orderItemsRelation()->get() as $item) {
-            $amount += $item->amount * $item->quantity;
+            $amount += ($item->amount * $item->quantity) + $item->delivery_cost;
         }
 
         $order->amount = $amount;
