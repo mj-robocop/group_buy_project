@@ -39,11 +39,18 @@ Route::group(['middleware' => 'auth'], function ($router) {
     Route::post('basket/editAddress', 'OrderController@editAddress');
 });
 
+Route::post('admin/order/item/status/{ids}', 'OrderController@changeOrderItemsStatus')
+    ->middleware('auth.admin');
+
 Route::group(['middleware' => 'auth', 'prefix' => 'payment'], function ($router) {
     Route::get('do/{orderId}', 'PaymentController@doPayment');
     Route::any('done/{orderId}/{payId}', 'PaymentController@donePayment')->name('donePayment');
+});
 
-    Route::post('setPayBack', 'PaymentController@setPayBack')->middleware('auth.admin');
-    Route::get('admin/getPayments', 'PaymentController@getPayments')->middleware('auth.admin');
-    Route::get('admin/getPayBacks', 'PaymentController@getPayBacks')->middleware('auth.admin');
+Route::group(['middleware' => 'auth.admin', 'prefix' => 'admin/payment'], function ($router) {
+    Route::get('getPayments', 'PaymentController@getPayments');
+
+    Route::get('getPayBacks', 'PaymentController@getPayBacks');
+    Route::post('payBack/set', 'PaymentController@setPayBack');
+    Route::post('payBack/status/{ids}', 'PaymentController@changePayBackStatus');
 });

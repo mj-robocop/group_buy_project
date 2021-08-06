@@ -278,8 +278,26 @@ class OrderController extends Controller
         } catch (\Throwable $throwable) {
             DB::rollBack();
 
-            return ['result' => false, 'exception' => $throwable];
+            return ['result' => false];
         }
+
+        return ['result' => true];
+    }
+
+    public function changeOrderItemsStatus(Request $request, $ids)
+    {
+        $validatedData = $request->validate([
+            'status' => [
+                'required',
+                Rule::in(OrderItemStatusEnums::ALL),
+            ],
+        ]);
+
+        OrderItem::query()
+            ->whereIn('id', explode(',', $ids))
+            ->update([
+                'status' => $validatedData['status']
+            ]);
 
         return ['result' => true];
     }

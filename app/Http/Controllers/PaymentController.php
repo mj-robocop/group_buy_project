@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OrderPayBack;
 use RuntimeException;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\OrderPay;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use App\Models\OrderPayBack;
+use Illuminate\Validation\Rule;
 use App\Models\GroupBuyProduct;
 use Illuminate\Support\Facades\DB;
 use Infrastructure\Enumerations\OrderStatusEnums;
@@ -140,7 +141,7 @@ class PaymentController extends Controller
             ],
             [
             'status' => OrderStatusEnums::UNPAID,
-            'amount' => $orderItem->amount * $orderItem->quantity,
+            'amount' => ($orderItem->amount * $orderItem->quantity) + $orderItem->delivery_cost,
         ]);
     }
 
@@ -318,5 +319,26 @@ class PaymentController extends Controller
         $orderController->calculateOrderAmount($order);
 
         throw new RuntimeException(__('messages.price_is_changed'));
+    }
+
+    public function changePayBackStatus(Request $request, $ids)
+    {
+        $validatedData = $request->validate([
+            'status' => [
+                'required',
+                Rule::in([
+                    OrderStatusEnums::PAID,
+                    OrderStatusEnums::UNPAID,
+                ])
+            ],
+        ]);
+
+        OrderPayBack::query()
+            ->whereIn('id', explode(',', $ids))
+            ->update([
+                'status' => $validatedData['status']
+            ]);
+
+        return ['result' => true];
     }
 }
