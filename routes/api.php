@@ -26,8 +26,11 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
     Route::post('currentUser', 'AuthController@currentUser');
 });
 
+Route::apiResource('user', 'UserController');
 Route::apiResource('product', 'ProductController');
 Route::apiResource('groupBuyProduct', 'GroupBuyProductController');
+
+Route::post('user/name', 'UserController@updateUserName');
 
 Route::group(['middleware' => 'auth'], function ($router) {
     Route::get('order', 'OrderController@index');

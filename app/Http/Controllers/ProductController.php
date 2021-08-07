@@ -101,6 +101,6 @@ class ProductController extends Controller
 
         $product->delete();
 
-        return __('messages.product_id_deleted', ['title' => $product->title]);
+        return __('messages.product_is_deleted', ['title' => $product->title]);
     }
 }
