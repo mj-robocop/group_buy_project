@@ -18,5 +18,6 @@ final class OrderItemStatusEnums
     const CANCELED_BEFORE_POSTING = 1299;
     const RETURN_REQUEST = 1300;
     const RETURN_ACCEPTED = 1301;
-    const RETURNED = 1302;
+    const RETURN_REJECTED = 1302;
+    const RETURNED = 1303;
 }

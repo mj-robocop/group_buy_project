@@ -268,7 +268,7 @@ class OrderController extends Controller
 
                 $paymentController = new PaymentController();
                 $payBack = $paymentController->setPayBack($id);
-            } elseif ($orderItem->status != OrderItemStatusEnums::CANCELED_BEFORE_POSTING) {
+            } elseif ($orderItem->status == OrderItemStatusEnums::POSTED) {
                 $orderItem->status = OrderItemStatusEnums::RETURN_REQUEST;
                 $orderItem->saveOrFail();
             } else {
