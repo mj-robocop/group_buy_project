@@ -28,6 +28,10 @@ class PaymentController extends Controller
         $order = Order::query()->findOrFail($orderId);
         $orderItems = $order->orderItemsRelation()->get();
 
+        if ($order->address == null) {
+            throw new RuntimeException(__('messages.address_is_not_set'));
+        }
+
         $this->checkOrderItems($orderItems);
         $this->checkOrderItemsAmount($order, $orderItems, true);
         $this->checkOrderAmount($order, $orderItems, true);
