@@ -26,7 +26,7 @@ class AddCreatedByToGroupBuyProductsTable extends Migration
     public function down()
     {
         Schema::table('group_buy_products', function (Blueprint $table) {
-            $table->integer('created_by');
+            $table->dropColumn('created_by');
         });
     }
 }

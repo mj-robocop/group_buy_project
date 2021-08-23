@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddGroupBuyProductIdToOrderItemsTable extends Migration
+class AddPostTrackingCodeToOrderItemsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddGroupBuyProductIdToOrderItemsTable extends Migration
     public function up()
     {
         Schema::table('order_items', function (Blueprint $table) {
-            $table->integer('group_buy_product_id')->nullable();
+            $table->string('post_tracking_code', 64)->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddGroupBuyProductIdToOrderItemsTable extends Migration
     public function down()
     {
         Schema::table('order_items', function (Blueprint $table) {
-            $table->dropColumn('group_buy_product_id');
+            $table->dropColumn('post_tracking_code');
         });
     }
 }
