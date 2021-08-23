@@ -110,6 +110,6 @@ class GroupBuyProductController extends Controller
 
         $groupBuyProduct->delete();
 
-        return __('messages.group_buy_product_id_deleted', ['title' => $groupBuyProduct->title]);
+        return __('messages.group_buy_product_is_deleted', ['title' => $groupBuyProduct->title]);
     }
 }

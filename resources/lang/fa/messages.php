@@ -1,8 +1,9 @@
 <?php
 
 return [
-    'product_id_deleted' => 'محصول «:title» با موفقیت حذف شد.',
-    'group_buy_product_id_deleted' => 'محصول خرید گروهی «:title» با موفقیت حذف شد.',
+    'user_is_deleted' => 'کاربر «:name» با موفقیت حذف شد.',
+    'product_is_deleted' => 'محصول «:title» با موفقیت حذف شد.',
+    'group_buy_product_is_deleted' => 'محصول خرید گروهی «:title» با موفقیت حذف شد.',
     'user_must_be_authenticated' => 'لطفا لاگین کنید.',
     'no_basket_found' => 'شما سبد خریدی ندارید.',
     'cart' => 'حداکثر «:max» عدد از کالای «:title» می‌توانید سفارش دهید.',

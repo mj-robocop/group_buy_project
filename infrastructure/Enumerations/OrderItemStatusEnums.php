@@ -20,4 +20,16 @@ final class OrderItemStatusEnums
     const RETURN_ACCEPTED = 1301;
     const RETURN_REJECTED = 1302;
     const RETURNED = 1303;
+
+    const ALL = [
+        self::WAITING_FOR_GROUP_BUY,
+        self::VERIFIED,
+        self::PREPARATION,
+        self::POSTED,
+        self::CANCELED_BEFORE_POSTING,
+        self::RETURN_REQUEST,
+        self::RETURN_ACCEPTED,
+        self::RETURN_REJECTED,
+        self::RETURNED,
+    ];
 }
