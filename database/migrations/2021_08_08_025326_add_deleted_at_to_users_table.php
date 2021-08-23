@@ -14,7 +14,7 @@ class AddDeletedAtToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('deleted_at')->nullable();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddDeletedAtToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('deleted_at');
+            $table->timestamp('deleted_at');
         });
     }
 }
