@@ -287,6 +287,7 @@ class OrderController extends Controller
     public function changeOrderItemsStatus(Request $request, $ids)
     {
         $validatedData = $request->validate([
+            'postTrackingCode' => 'nullable|string|max:64',
             'status' => [
                 'required',
                 Rule::in(OrderItemStatusEnums::ALL),
@@ -296,7 +297,8 @@ class OrderController extends Controller
         OrderItem::query()
             ->whereIn('id', explode(',', $ids))
             ->update([
-                'status' => $validatedData['status']
+                'status' => $validatedData['status'],
+                'post_tracking_code' => $validatedData['postTrackingCode'] ?? null
             ]);
 
         return ['result' => true];
