@@ -297,7 +297,8 @@ class OrderController extends Controller
         OrderItem::query()
             ->whereIn('id', explode(',', $ids))
             ->update([
-                'status' => $validatedData['status']
+                'status' => $validatedData['status'],
+                'post_tracking_code' => $validatedData['postTrackingCode'] ?? null
             ]);
 
         if (array_key_exists('postTrackingCode', $validatedData)) {
