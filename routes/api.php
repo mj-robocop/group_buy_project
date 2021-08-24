@@ -37,6 +37,8 @@ Route::group(['middleware' => 'auth'], function ($router) {
     Route::get('order/{id}', 'OrderController@show');
     Route::delete('order/item/{id}', 'OrderController@cancelOrderItem');
 
+    Route::post('order/item/review/{id}', 'OrderController@createReview');
+
     Route::get('basket', 'OrderController@getBasket');
     Route::post('basket/addToBasket', 'OrderController@addToBasket');
     Route::post('basket/editAddress', 'OrderController@editAddress');

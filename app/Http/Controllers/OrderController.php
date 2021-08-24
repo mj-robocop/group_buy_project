@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use RuntimeException;
 use App\Models\Order;
+use App\Models\Review;
 use App\Models\Product;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
@@ -310,5 +311,42 @@ class OrderController extends Controller
         }
 
         return ['result' => true];
+    }
+
+    public function createReview(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'star' => 'required|int|min:1|max:5',
+            'description' => 'nullable|string|max:256'
+        ]);
+
+        $orderItem = OrderItem::query()->findOrFail($id);
+
+        if (
+            $orderItem->status == null
+            || $orderItem->status == OrderItemStatusEnums::WAITING_FOR_GROUP_BUY
+        ) {
+            return ['result' => false];
+        }
+
+        $reviewExists = Review::withTrashed()
+            ->where('user_id', Auth::id())
+            ->where('order_id', $orderItem->order_id)
+            ->where('product_id', $orderItem->product_id)
+            ->exists();
+
+        if ($reviewExists) {
+            throw new RuntimeException(__('messages.has_reviewed_this_item_before'));
+        }
+
+        $review = new Review();
+
+        $review->user_id = Auth::id();
+        $review->star = $validatedData['star'];
+        $review->order_id = $orderItem->order_id;
+        $review->product_id = $orderItem->product_id;
+        $review->description = $validatedData['description'] ?? null;
+
+        return ['result' => $review->saveOrFail()];
     }
 }

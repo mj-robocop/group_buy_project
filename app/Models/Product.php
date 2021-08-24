@@ -15,4 +15,9 @@ class Product extends Model
      * @var array
      */
     protected $guarded = [];
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

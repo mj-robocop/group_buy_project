@@ -19,8 +19,8 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param  Request  $request
-     * @return Collection
+     * @param Request $request
+     * @return array
      */
     public function index(Request $request)
     {
@@ -29,10 +29,25 @@ class ProductController extends Controller
             'offset' => 'nullable|int',
         ]);
 
-        return $products = Product::query()
+        $products = Product::query()
+            ->with('reviews')
             ->limit($validatedData['limit'] ?? 10)
             ->offset($validatedData['offset'] ?? 0)
             ->get();
+
+        $result = [];
+
+        foreach ($products as $product) {
+            $reviews = $product->reviews;
+            $product->unsetRelation('reviews');
+
+            $result [] = [
+                'product' => $product,
+                'reviews' => $reviews
+            ];
+        }
+
+        return $result;
     }
 
     /**
@@ -54,12 +69,22 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return Response
+     * @param int $id
+     * @return array|null[]
      */
     public function show($id)
     {
-        return Product::find($id);
+        $product = Product::find($id);
+        $reviews = [];
+
+        if ($product != null) {
+            $reviews = $product->reviews()->get();
+        }
+
+        return [
+            'product' => $product,
+            'reviews' => $reviews
+        ];
     }
 
     /**

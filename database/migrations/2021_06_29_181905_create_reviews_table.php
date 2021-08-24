@@ -19,7 +19,7 @@ class CreateReviewsTable extends Migration
             $table->integer('user_id');
             $table->integer('order_id');
             $table->smallInteger('star');
-            $table->string('description', 256);
+            $table->string('description', 256)->nullable();
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
         });
