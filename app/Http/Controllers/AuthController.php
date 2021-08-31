@@ -49,7 +49,7 @@ class AuthController extends Controller
         $credentials = request(['email', 'password']);
 
         if (! $token = JWTAuth::attempt($credentials)) {
-            return response()->json(['error' => 'username or password is wrong!'], 401);
+            return response()->json(['error' => 'نام کاربری/رمز عبور وارد شده اشتباه است!'], 401);
         }
 
         return $this->respondWithToken($token);
@@ -74,7 +74,7 @@ class AuthController extends Controller
     {
         auth()->logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['message' => 'خروج شما موفقیت آمیز بود.']);
     }
 
     /**
